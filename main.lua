@@ -1,84 +1,73 @@
---// حذف القديم لو موجود
+--// Anti duplicate
 pcall(function()
-    game.CoreGui.FakeRobuxGUI:Destroy()
+    game.CoreGui.FakeRobuxPro:Destroy()
 end)
 
---// إنشاء GUI
-local ScreenGui = Instance.new("ScreenGui")
-local Frame = Instance.new("Frame")
-local Title = Instance.new("TextLabel")
-local TextBox = Instance.new("TextBox")
-local Button = Instance.new("TextButton")
-local Result = Instance.new("TextLabel")
-local Close = Instance.new("TextButton")
+--// GUI
+local gui = Instance.new("ScreenGui", game.CoreGui)
+gui.Name = "FakeRobuxPro"
 
-ScreenGui.Name = "FakeRobuxGUI"
-ScreenGui.Parent = game.CoreGui
+local frame = Instance.new("Frame", gui)
+frame.Size = UDim2.new(0, 320, 0, 190)
+frame.Position = UDim2.new(0.4, 0, 0.4, 0)
+frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+frame.Active = true
+frame.Draggable = true
 
-Frame.Parent = ScreenGui
-Frame.Size = UDim2.new(0, 300, 0, 180)
-Frame.Position = UDim2.new(0.5, -150, 0.5, -90)
-Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
-Frame.Active = true
-Frame.Draggable = true
+--// Title
+local title = Instance.new("TextLabel", frame)
+title.Size = UDim2.new(1,0,0,35)
+title.Text = "💸 Fake Robux Panel"
+title.BackgroundTransparency = 1
+title.TextColor3 = Color3.new(1,1,1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 18
 
---// عنوان
-Title.Parent = Frame
-Title.Size = UDim2.new(1,0,0,30)
-Title.Text = "💸 Fake Robux Generator"
-Title.BackgroundTransparency = 1
-Title.TextColor3 = Color3.new(1,1,1)
-Title.Font = Enum.Font.SourceSansBold
-Title.TextSize = 20
+--// Close
+local close = Instance.new("TextButton", frame)
+close.Size = UDim2.new(0,35,0,35)
+close.Position = UDim2.new(1,-35,0,0)
+close.Text = "X"
+close.BackgroundColor3 = Color3.fromRGB(170,0,0)
 
---// زر إغلاق
-Close.Parent = Frame
-Close.Size = UDim2.new(0,30,0,30)
-Close.Position = UDim2.new(1,-30,0,0)
-Close.Text = "X"
-Close.BackgroundColor3 = Color3.fromRGB(170,0,0)
-Close.TextColor3 = Color3.new(1,1,1)
-
-Close.MouseButton1Click:Connect(function()
-    ScreenGui:Destroy()
+close.MouseButton1Click:Connect(function()
+    gui:Destroy()
 end)
 
---// إدخال الرقم
-TextBox.Parent = Frame
-TextBox.Size = UDim2.new(0.8,0,0,35)
-TextBox.Position = UDim2.new(0.1,0,0.3,0)
-TextBox.PlaceholderText = "اكتب عدد الروبوكس"
-TextBox.Text = ""
-TextBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
-TextBox.TextColor3 = Color3.new(1,1,1)
+--// Input
+local box = Instance.new("TextBox", frame)
+box.Size = UDim2.new(0.8,0,0,35)
+box.Position = UDim2.new(0.1,0,0.3,0)
+box.PlaceholderText = "Enter Robux Amount"
+box.BackgroundColor3 = Color3.fromRGB(40,40,40)
+box.TextColor3 = Color3.new(1,1,1)
 
---// زر التنفيذ
-Button.Parent = Frame
-Button.Size = UDim2.new(0.8,0,0,35)
-Button.Position = UDim2.new(0.1,0,0.55,0)
-Button.Text = "Generate"
-Button.BackgroundColor3 = Color3.fromRGB(0,170,255)
-Button.TextColor3 = Color3.new(1,1,1)
+--// Button
+local btn = Instance.new("TextButton", frame)
+btn.Size = UDim2.new(0.8,0,0,35)
+btn.Position = UDim2.new(0.1,0,0.55,0)
+btn.Text = "Generate"
+btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
 
---// النتيجة
-Result.Parent = Frame
-Result.Size = UDim2.new(0.8,0,0,30)
-Result.Position = UDim2.new(0.1,0,0.78,0)
-Result.Text = "رصيدك: 0"
-Result.BackgroundTransparency = 1
-Result.TextColor3 = Color3.fromRGB(0,255,0)
-Result.TextScaled = true
+--// Result
+local result = Instance.new("TextLabel", frame)
+result.Size = UDim2.new(0.8,0,0,30)
+result.Position = UDim2.new(0.1,0,0.78,0)
+result.Text = "Balance: 0 R$"
+result.BackgroundTransparency = 1
+result.TextColor3 = Color3.fromRGB(0,255,0)
+result.TextScaled = true
 
---// منطق الروبوكس الوهمي
-local fakeBalance = 0
+--// Logic
+local balance = 0
 
-Button.MouseButton1Click:Connect(function()
-    local amount = tonumber(TextBox.Text)
+btn.MouseButton1Click:Connect(function()
+    local num = tonumber(box.Text)
 
-    if amount and amount > 0 then
-        fakeBalance = fakeBalance + amount
-        Result.Text = "رصيدك: " .. fakeBalance .. " R$"
+    if num and num > 0 then
+        balance += num
+        result.Text = "Balance: "..balance.." R$"
     else
-        Result.Text = "اكتب رقم صحيح"
+        result.Text = "Invalid number"
     end
 end)
