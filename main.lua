@@ -1,96 +1,84 @@
-local TeleportService = game:GetService("TeleportService")
-local Players = game:GetService("Players")
-
-local PLACE_ID = game.PlaceId
-
-local servers = {}
-
--- 🔥 Fetch باستخدام request (مو HttpService)
-local function fetchServers()
-    local cursor = ""
-    
-    for i = 1,3 do -- يجيب 3 صفحات
-        local url = "https://games.roblox.com/v1/games/"..PLACE_ID.."/servers/Public?sortOrder=Asc&limit=100"
-        if cursor ~= "" then
-            url = url .. "&cursor="..cursor
-        end
-        
-        local res = request({
-            Url = url,
-            Method = "GET"
-        })
-        
-        local data = game:GetService("HttpService"):JSONDecode(res.Body)
-        
-        for _, v in pairs(data.data) do
-            if v.playing < v.maxPlayers then
-                table.insert(servers, v)
-            end
-        end
-        
-        cursor = data.nextPageCursor
-        if not cursor then break end
-    end
-end
-
--- 🔥 ترتيب احترافي
-local function sortServers()
-    table.sort(servers, function(a, b)
-        return a.playing < b.playing
-    end)
-end
-
--- 🔥 UI
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "PennyPro"
-
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 330, 0, 450)
-frame.Position = UDim2.new(0, 20, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(10,10,10)
-
-local layout = Instance.new("UIListLayout", frame)
-layout.Padding = UDim.new(0,5)
-
--- 🔄 Refresh
-local refresh = Instance.new("TextButton", frame)
-refresh.Size = UDim2.new(1,0,0,40)
-refresh.Text = "🔄 Refresh (Smart Scan)"
-refresh.BackgroundColor3 = Color3.fromRGB(20,20,20)
-refresh.TextColor3 = Color3.new(1,1,1)
-
--- 🔥 Render
-local function render()
-    for _, v in pairs(servers) do
-        local btn = Instance.new("TextButton", frame)
-        btn.Size = UDim2.new(1,0,0,50)
-        btn.BackgroundColor3 = Color3.fromRGB(25,25,25)
-
-        btn.Text = "👥 "..v.playing.."/"..v.maxPlayers
-        btn.TextColor3 = Color3.new(1,1,1)
-
-        btn.MouseButton1Click:Connect(function()
-            TeleportService:TeleportToPlaceInstance(PLACE_ID, v.id, Players.LocalPlayer)
-        end)
-    end
-end
-
--- 🔄 Refresh Action
-refresh.MouseButton1Click:Connect(function()
-    servers = {}
-
-    for _, v in pairs(frame:GetChildren()) do
-        if v:IsA("TextButton") and v ~= refresh then
-            v:Destroy()
-        end
-    end
-
-    fetchServers()
-    sortServers()
-    render()
+--// حذف القديم لو موجود
+pcall(function()
+    game.CoreGui.FakeRobuxGUI:Destroy()
 end)
 
--- 🚀 تشغيل
-fetchServers()
-sortServers()
-render()
+--// إنشاء GUI
+local ScreenGui = Instance.new("ScreenGui")
+local Frame = Instance.new("Frame")
+local Title = Instance.new("TextLabel")
+local TextBox = Instance.new("TextBox")
+local Button = Instance.new("TextButton")
+local Result = Instance.new("TextLabel")
+local Close = Instance.new("TextButton")
+
+ScreenGui.Name = "FakeRobuxGUI"
+ScreenGui.Parent = game.CoreGui
+
+Frame.Parent = ScreenGui
+Frame.Size = UDim2.new(0, 300, 0, 180)
+Frame.Position = UDim2.new(0.5, -150, 0.5, -90)
+Frame.BackgroundColor3 = Color3.fromRGB(20,20,20)
+Frame.Active = true
+Frame.Draggable = true
+
+--// عنوان
+Title.Parent = Frame
+Title.Size = UDim2.new(1,0,0,30)
+Title.Text = "💸 Fake Robux Generator"
+Title.BackgroundTransparency = 1
+Title.TextColor3 = Color3.new(1,1,1)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
+
+--// زر إغلاق
+Close.Parent = Frame
+Close.Size = UDim2.new(0,30,0,30)
+Close.Position = UDim2.new(1,-30,0,0)
+Close.Text = "X"
+Close.BackgroundColor3 = Color3.fromRGB(170,0,0)
+Close.TextColor3 = Color3.new(1,1,1)
+
+Close.MouseButton1Click:Connect(function()
+    ScreenGui:Destroy()
+end)
+
+--// إدخال الرقم
+TextBox.Parent = Frame
+TextBox.Size = UDim2.new(0.8,0,0,35)
+TextBox.Position = UDim2.new(0.1,0,0.3,0)
+TextBox.PlaceholderText = "اكتب عدد الروبوكس"
+TextBox.Text = ""
+TextBox.BackgroundColor3 = Color3.fromRGB(40,40,40)
+TextBox.TextColor3 = Color3.new(1,1,1)
+
+--// زر التنفيذ
+Button.Parent = Frame
+Button.Size = UDim2.new(0.8,0,0,35)
+Button.Position = UDim2.new(0.1,0,0.55,0)
+Button.Text = "Generate"
+Button.BackgroundColor3 = Color3.fromRGB(0,170,255)
+Button.TextColor3 = Color3.new(1,1,1)
+
+--// النتيجة
+Result.Parent = Frame
+Result.Size = UDim2.new(0.8,0,0,30)
+Result.Position = UDim2.new(0.1,0,0.78,0)
+Result.Text = "رصيدك: 0"
+Result.BackgroundTransparency = 1
+Result.TextColor3 = Color3.fromRGB(0,255,0)
+Result.TextScaled = true
+
+--// منطق الروبوكس الوهمي
+local fakeBalance = 0
+
+Button.MouseButton1Click:Connect(function()
+    local amount = tonumber(TextBox.Text)
+
+    if amount and amount > 0 then
+        fakeBalance = fakeBalance + amount
+        Result.Text = "رصيدك: " .. fakeBalance .. " R$"
+    else
+        Result.Text = "اكتب رقم صحيح"
+    end
+end)
