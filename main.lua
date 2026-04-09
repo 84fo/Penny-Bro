@@ -1,73 +1,51 @@
---// Anti duplicate
-pcall(function()
-    game.CoreGui.FakeRobuxPro:Destroy()
-end)
+-- GUI Teleport Script
+local player = game.Players.LocalPlayer
+local character = player.Character or player.CharacterAdded:Wait()
 
---// GUI
-local gui = Instance.new("ScreenGui", game.CoreGui)
-gui.Name = "FakeRobuxPro"
+local savedPosition = nil
 
-local frame = Instance.new("Frame", gui)
-frame.Size = UDim2.new(0, 320, 0, 190)
-frame.Position = UDim2.new(0.4, 0, 0.4, 0)
-frame.BackgroundColor3 = Color3.fromRGB(15,15,15)
+local screenGui = Instance.new("ScreenGui", game.CoreGui)
+
+local frame = Instance.new("Frame", screenGui)
+frame.Size = UDim2.new(0, 200, 0, 120)
+frame.Position = UDim2.new(0.5, -100, 0.5, -60)
+frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
 frame.Active = true
 frame.Draggable = true
 
---// Title
-local title = Instance.new("TextLabel", frame)
-title.Size = UDim2.new(1,0,0,35)
-title.Text = "💸 Fake Robux Panel"
-title.BackgroundTransparency = 1
-title.TextColor3 = Color3.new(1,1,1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 18
+local saveBtn = Instance.new("TextButton", frame)
+saveBtn.Size = UDim2.new(1, -20, 0, 40)
+saveBtn.Position = UDim2.new(0, 10, 0, 10)
+saveBtn.Text = "Save Position"
+saveBtn.BackgroundColor3 = Color3.fromRGB(0, 170, 255)
+saveBtn.TextColor3 = Color3.new(1,1,1)
 
---// Close
-local close = Instance.new("TextButton", frame)
-close.Size = UDim2.new(0,35,0,35)
-close.Position = UDim2.new(1,-35,0,0)
-close.Text = "X"
-close.BackgroundColor3 = Color3.fromRGB(170,0,0)
+local tpBtn = Instance.new("TextButton", frame)
+tpBtn.Size = UDim2.new(1, -20, 0, 40)
+tpBtn.Position = UDim2.new(0, 10, 0, 60)
+tpBtn.Text = "Teleport"
+tpBtn.BackgroundColor3 = Color3.fromRGB(0, 255, 100)
+tpBtn.TextColor3 = Color3.new(1,1,1)
 
-close.MouseButton1Click:Connect(function()
-    gui:Destroy()
+saveBtn.MouseButton1Click:Connect(function()
+    if character and character:FindFirstChild("HumanoidRootPart") then
+        savedPosition = character.HumanoidRootPart.CFrame
+        saveBtn.Text = "Saved!"
+        task.wait(1)
+        saveBtn.Text = "Save Position"
+    end
 end)
 
---// Input
-local box = Instance.new("TextBox", frame)
-box.Size = UDim2.new(0.8,0,0,35)
-box.Position = UDim2.new(0.1,0,0.3,0)
-box.PlaceholderText = "Enter Robux Amount"
-box.BackgroundColor3 = Color3.fromRGB(40,40,40)
-box.TextColor3 = Color3.new(1,1,1)
-
---// Button
-local btn = Instance.new("TextButton", frame)
-btn.Size = UDim2.new(0.8,0,0,35)
-btn.Position = UDim2.new(0.1,0,0.55,0)
-btn.Text = "Generate"
-btn.BackgroundColor3 = Color3.fromRGB(0,170,255)
-
---// Result
-local result = Instance.new("TextLabel", frame)
-result.Size = UDim2.new(0.8,0,0,30)
-result.Position = UDim2.new(0.1,0,0.78,0)
-result.Text = "Balance: 0 R$"
-result.BackgroundTransparency = 1
-result.TextColor3 = Color3.fromRGB(0,255,0)
-result.TextScaled = true
-
---// Logic
-local balance = 0
-
-btn.MouseButton1Click:Connect(function()
-    local num = tonumber(box.Text)
-
-    if num and num > 0 then
-        balance += num
-        result.Text = "Balance: "..balance.." R$"
+tpBtn.MouseButton1Click:Connect(function()
+    if savedPosition then
+        character.HumanoidRootPart.CFrame = savedPosition
     else
-        result.Text = "Invalid number"
+        tpBtn.Text = "No Position!"
+        task.wait(1)
+        tpBtn.Text = "Teleport"
     end
+end)
+
+player.CharacterAdded:Connect(function(char)
+    character = char
 end)
